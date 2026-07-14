@@ -1,4 +1,9 @@
 from fastapi import FastAPI
-app=FastAPI(title='SENOTA Vault Storage')
-@app.get('/')
-def root(): return {'service':'senota-vault-storage','version':'1.0.0'}
+from src.routes.main_router import router
+
+app = FastAPI(title="SENOTA Vault Storage")
+app.include_router(router)
+
+@app.get("/")
+def root():
+    return {"service":"SENOTA Vault Storage","status":"running"}
