@@ -1,12 +1,14 @@
 from src.services.asset_service import AssetService
 from src.services.processing_pipeline_service import ProcessingPipelineService
 from src.services.asset_repository_service import AssetRepositoryService
+from src.fingerprint_database_service import FingerprintDatabaseService
 
 class UploadPipelineService:
     def __init__(self):
         self.assets=AssetService()
         self.pipeline=ProcessingPipelineService()
         self.repo=AssetRepositoryService()
+        self.fingerprint_db = FingerprintDatabaseService()
 
     async def process_upload(self, customer_id, upload_file):
         asset=self.assets.create_asset_record(customer_id, upload_file.filename, upload_file.content_type or "application/octet-stream")
@@ -21,4 +23,14 @@ class UploadPipelineService:
             "success":True
         }
         self.repo.save(response)
+
+        for algorithm, fp in response["fingerprints"].items():
+
+            self.fingerprint_db.add(
+                asset_id=response["asset_id"],
+                customer_id=response["customer_id"],
+                algorithm=algorithm,
+                fingerprint=fp.fingerprint
+            )
+
         return response

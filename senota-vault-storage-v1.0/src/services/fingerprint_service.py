@@ -32,9 +32,19 @@ class FingerprintService:
             fingerprint=str(fp),
             generated_at=datetime.utcnow(),
         )
+    def generate_dhash(self, image_path: str) -> FingerprintResult:
+        with Image.open(Path(image_path)) as img:
+            fp = imagehash.dhash(img)
+
+        return FingerprintResult(
+            algorithm="dhash",
+            fingerprint=str(fp),
+            generated_at=datetime.utcnow(),
+        )
 
     def generate_all(self, image_path: str) -> dict:
         """Future expansion point for multiple fingerprint algorithms."""
         return {
-            "phash": self.generate_phash(image_path)
+            "phash": self.generate_phash(image_path),
+            "dhash": self.generate_dhash(image_path),
         }
